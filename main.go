@@ -1,35 +1,41 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
-	"sync"
+	"os"
+	"strings"
 )
 
-func main() {
-	code := make(chan int)
-	var wg sync.WaitGroup
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-		go func() {
-			getHttpCode(code)
-			wg.Done()
-		}()
+func ping(url string, respCh chan int, errCh chan error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		errCh <- err
+		return
 	}
-	go func() {
-		wg.Wait()
-		close(code)
-	}()
-	for res := range code {
-		fmt.Printf("Код: %d\n", res)	
-		
-	}
+	respCh <- resp.StatusCode
 }
 
-func getHttpCode(codeCh chan int) {
-	resp, err := http.Get("https://google.com")
+func main() {
+	path := flag.String("file", "url.txt", "path to URL file")
+	flag.Parse()
+	file, err := os.ReadFile(*path)
 	if err != nil {
-		fmt.Printf("Ошибка: %s", err.Error())
+		panic(err.Error())
 	}
-	codeCh <- resp.StatusCode
+	urlSlice := strings.Split(string(file), "\n")
+	respCh := make(chan int)
+	errCh := make(chan error)
+	for _, url := range urlSlice {
+		go ping(url, respCh, errCh)
+	}
+	for range urlSlice {
+		select {
+		case err := <-errCh:
+			fmt.Println(err)
+		case res := <-respCh:
+			fmt.Println(res)
+		}
+	}
 }
