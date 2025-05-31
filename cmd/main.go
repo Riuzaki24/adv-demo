@@ -2,13 +2,17 @@ package main
 
 import (
 	"fmt"
+	"go/adv-demo/configs"
+	"go/adv-demo/internal/auth"
 	"net/http"
-	"go/adv-demo/internal/hello"
 )
 
 func main() {
+	conf := configs.LoadConfig()    
 	router := http.NewServeMux()
-	hello.NewHelloHandler(router)
+	auth.NewAuthHandler(router, auth.AuthHandlerDeps{
+		Config: conf, 
+	})
 
 
 	server := http.Server{
