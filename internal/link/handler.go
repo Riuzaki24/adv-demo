@@ -1,6 +1,7 @@
 package link
 
 import (
+	"go/adv-demo/pkg/middleware"
 	"go/adv-demo/pkg/req"
 	"go/adv-demo/pkg/res"
 	"net/http"
@@ -22,7 +23,7 @@ func NewLinkHandler(router *http.ServeMux, deps LinkHandlerDeps) {
 		LinkRepository: deps.LinkRepository,
 	}
 	router.HandleFunc("POST /link", handler.Create())
-	router.HandleFunc("PATCH /link/{id}", handler.Update())
+	router.Handle("PATCH /link/{id}", middleware.IsAuthed(handler.Update()))
 	router.HandleFunc("DELETE /link/{id}", handler.Delete())
 	router.HandleFunc("GET /{hash}", handler.GoTo())
 }
@@ -61,6 +62,7 @@ func (handler *LinkHandler) Update() http.HandlerFunc {
 		id, err := strconv.ParseUint(idString, 10, 32)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
 		}
 		link, err := handler.LinkRepository.Update(&Link{
 			Model: gorm.Model{ID: uint(id)},
@@ -69,6 +71,7 @@ func (handler *LinkHandler) Update() http.HandlerFunc {
 		})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
 		}
 		res.Json(w, link, 201)
 	}
@@ -80,10 +83,17 @@ func (handler *LinkHandler) Delete() http.HandlerFunc {
 		id, err := strconv.ParseUint(idString, 10, 32)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		_, err = handler.LinkRepository.GetById(uint(id))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
 		}
 		err = handler.LinkRepository.Delete(uint(id))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		res.Json(w, nil, 200)
 	}
