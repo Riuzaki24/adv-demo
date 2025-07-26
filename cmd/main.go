@@ -10,40 +10,30 @@ import (
 	"go/adv-demo/pkg/db"
 	"go/adv-demo/pkg/middleware"
 	"net/http"
-	"time"
 )
 
-
 func main() {
+	type key int
+	const EmailKey keygi = 0
 	ctx := context.Background()
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, 2 * time.Second)
-	defer cancel()
+	ctxWithValue := context.WithValue(ctx, EmailKey, "a@a.ru")
 
-	done := make (chan struct{})
-	go func() {
-		time.Sleep(3 * time.Second)
-		close(done)
-	}()
-
-	select {
-	case <- done:
-		fmt.Println("done task")
-	case <- ctxWithTimeout.Done():
-		fmt.Println("Timeout")
+	if userEmail, ok := ctxWithValue.Value(EmailKey).(string); ok {
+		fmt.Println(userEmail)
+	} else {
+		fmt.Println("No value")
 	}
 }
 
 func main2() {
-	conf := configs.LoadConfig()   
+	conf := configs.LoadConfig()
 	db := db.NewDb(conf)
 	router := http.NewServeMux()
-
 
 	// repositories
 
 	linkRepository := link.NewLinkRepository(db)
 	userRepository := user.NewUserRepository(db)
-
 
 	// Services
 
@@ -51,7 +41,7 @@ func main2() {
 
 	// Handler
 	auth.NewAuthHandler(router, auth.AuthHandlerDeps{
-		Config: conf, 
+		Config:      conf,
 		AuthService: authService,
 	})
 
@@ -60,8 +50,8 @@ func main2() {
 	})
 
 	//middlewares
-	stack := middleware.Chain (
-		middleware.CORS, 
+	stack := middleware.Chain(
+		middleware.CORS,
 		middleware.Logging,
 	)
 
