@@ -1,41 +1,18 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"go/adv-demo/configs"
 	"go/adv-demo/internal/auth"
 	"go/adv-demo/internal/link"
+	"go/adv-demo/internal/stat"
 	"go/adv-demo/internal/user"
 	"go/adv-demo/pkg/db"
 	"go/adv-demo/pkg/middleware"
 	"net/http"
-	"time"
 )
 
-func tickOperation(ctx context.Context) {
-	ticker := time.NewTicker(200 * time.Millisecond)
-	for {
-		select {
-		case <- ticker.C:
-			fmt.Println("tick")
-		case <- ctx.Done():
-			fmt.Println("cancel")
-			return
-		}
-	}
-}
-
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	go tickOperation(ctx)
-
-	time.Sleep(2 * time.Second)
-	cancel()
-	time.Sleep(2 * time.Second) 
-}
-
-func main2() {
 	conf := configs.LoadConfig()
 	db := db.NewDb(conf)
 	router := http.NewServeMux()
@@ -44,6 +21,7 @@ func main2() {
 
 	linkRepository := link.NewLinkRepository(db)
 	userRepository := user.NewUserRepository(db)
+	statRepository := stat.NewStatRepository(db)
 
 	// Services
 
@@ -57,6 +35,8 @@ func main2() {
 
 	link.NewLinkHandler(router, link.LinkHandlerDeps{
 		LinkRepository: linkRepository,
+		StatRepository: statRepository,
+		Config:         conf,
 	})
 
 	//middlewares
