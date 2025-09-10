@@ -1,5 +1,9 @@
 package event
 
+const (
+	EventLinkVisited = "link.visited"
+)
+
 type Event struct {
 	Type string
 	Data any
@@ -20,6 +24,6 @@ func (e *EventBus) Publish(event Event) {
 }
 
 func (e *EventBus) Subscribe() <- chan Event {
-	return e.bus
+	return e.bus 
 }
 
