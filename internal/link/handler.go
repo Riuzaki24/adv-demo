@@ -3,7 +3,11 @@ package link
 import (
 	"fmt"
 	"go/adv-demo/configs"
+<<<<<<< HEAD
 	"go/adv-demo/pkg/event"
+=======
+	"go/adv-demo/internal/stat"
+>>>>>>> 4891e7b
 	"go/adv-demo/pkg/middleware"
 	"go/adv-demo/pkg/req"
 	"go/adv-demo/pkg/res"
@@ -15,13 +19,21 @@ import (
 
 type LinkHandlerDeps struct {
 	LinkRepository *LinkRepository
+<<<<<<< HEAD
+=======
+	StatRepository *stat.StatRepository
+>>>>>>> 4891e7b
 	Config         *configs.Config
 	EventBus       *event.EventBus
 }
 
 type LinkHandler struct {
 	LinkRepository *LinkRepository
+<<<<<<< HEAD
 	EventBus       *event.EventBus
+=======
+	StatRepository *stat.StatRepository
+>>>>>>> 4891e7b
 }
 
 func NewLinkHandler(router *http.ServeMux, deps LinkHandlerDeps) {
