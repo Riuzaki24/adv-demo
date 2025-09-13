@@ -10,5 +10,5 @@ type Stat struct {
 	gorm.Model
 	LinkId uint `json:"link_id"`
 	Clicks int `json:"clicks"`
-	Data datatypes.Date `json:"date"`
+	Date datatypes.Date `json:"date"`
 }

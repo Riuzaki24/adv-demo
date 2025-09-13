@@ -25,7 +25,7 @@ func (repo *StatRepository) AddClick(linkId uint) {
 		repo.Db.Create(&Stat {
 			LinkId: linkId,
 			Clicks: 1,
-			Data: currentDate,
+			Date: currentDate,
 		})
 	} else {
 		stat.Clicks += 1
