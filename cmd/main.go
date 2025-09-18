@@ -43,6 +43,11 @@ func main() {
 		Config:         conf,
 	})
 
+	stat.NewStatHandler(router, stat.StatHandlerDeps{
+		StatRepository: statRepository,
+		Config: conf,
+	})
+
 	//middlewares
 	stack := middleware.Chain(
 		middleware.CORS,

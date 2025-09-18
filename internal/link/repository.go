@@ -69,7 +69,7 @@ func (repo *LinkRepository) Count() int64 {
 }
 
 func (repo *LinkRepository) GetAll(limit, offset int) []Link{
-	var links []Link
+	var links []Link 
 	repo.DataBase.
 		Table("links"). 
 		Where("deleted_at is null").
