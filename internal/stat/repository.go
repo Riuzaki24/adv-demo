@@ -44,10 +44,10 @@ func (repo *StatRepository) GetStats(by string, from, to time.Time) []GetStatRes
 		
 	}
 	repo.DB.Table("stats"). 
-	Select(selectQuery).
-	Where("date BETWEEN ? AND ?", from, to).
-	Group("period").
-	Order("period").
-	Scan(&stats)
+		Select(selectQuery).
+		Where("date BETWEEN ? AND ?", from, to).
+		Group("period").
+		Order("period").
+		Scan(&stats)
 	return stats
 }
