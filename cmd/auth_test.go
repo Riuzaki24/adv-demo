@@ -53,6 +53,7 @@ func TestLoginSuccess(t *testing.T) {
 		Email:    "a2@a.ru",
 		Password: "1",
 	})
+	
 	res, err := http.Post(ts.URL+"/auth/login", "application/json", bytes.NewReader(data))
 	if err != nil {
 		t.Fatal(err)
